@@ -1,5 +1,8 @@
+from typing import List
+
 from fastapi import APIRouter
 
+from app.bookings.schemas import SBooking
 from app.bookings.service import BookingService
 
 router = APIRouter(
@@ -8,5 +11,5 @@ router = APIRouter(
 )
 
 @router.get("")
-async def get_bookings():
-    return await BookingService.find_by_id(1)
+async def get_bookings() -> List[SBooking]:
+    return await BookingService.find_all()
