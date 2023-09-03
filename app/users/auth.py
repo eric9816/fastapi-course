@@ -5,6 +5,7 @@ from passlib.context import CryptContext
 from pydantic import EmailStr
 
 from app.users.service import UserService
+from app.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -23,7 +24,7 @@ def create_access_token(data: dict) -> str:
     to_encode.update({'exp': expire})
 
     encoded_jwt = jwt.encode(
-        to_encode, "jkfdghjkdfHJSDG", algorithm="HS256"
+        to_encode, settings.SECRET_KEY, algorithm=settings.AUTH_ALGORYTHM
     )
     return encoded_jwt
 
