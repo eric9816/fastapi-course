@@ -5,7 +5,7 @@ from sqlalchemy.sql.functions import count
 
 from app.bookings.models import Bookings
 from app.database import async_session_maker
-from app.hotels.models import Rooms
+from app.hotels.rooms.models import Rooms
 from app.service.base import BaseService
 
 
