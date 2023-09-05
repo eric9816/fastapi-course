@@ -33,3 +33,12 @@ BookingRoomCannotBeBooked = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail='Не осталось свободных номеров'
 )
+
+CannotBookHotelForLongPeriod = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+    detail='Нельзя забронировать отель на долгое время'
+)
+DateFromCannotBeAfterDateTo = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
+    detail='Время "от" не может быть больше времени "после"'
+)
