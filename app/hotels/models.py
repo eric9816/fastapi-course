@@ -15,6 +15,9 @@ class Hotels(Base):
 
     rooms: Mapped[list["Rooms"]] = relationship(back_populates="hotel")
 
+    def __str__(self):
+        return f"Отель {self.name}"
+
 # old_alchemy
 
 # class Hotels(Base):
