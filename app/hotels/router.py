@@ -5,7 +5,8 @@ from typing import List, Optional
 from fastapi import APIRouter, Query
 from fastapi_cache.decorator import cache
 
-from app.exceptions import CannotBookHotelForLongPeriod, DateFromCannotBeAfterDateTo
+#from app.exceptions import CannotBookHotelForLongPeriod, DateFromCannotBeAfterDateTo
+
 from app.hotels.service import HotelService
 from app.hotels.schemas import SHotel, SHotelInfo
 
@@ -79,3 +80,4 @@ async def get_noorm():
         res = res.scalars().all()
         res = jsonable_encoder(res)
         return res
+
