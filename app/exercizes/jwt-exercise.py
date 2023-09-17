@@ -1,5 +1,7 @@
-from jose import jwt
 from datetime import datetime, timedelta
+
+from jose import jwt
+
 
 def create_access_token(data: dict) -> str:
     to_encode = data.copy()

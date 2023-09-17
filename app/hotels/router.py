@@ -5,10 +5,11 @@ from typing import List, Optional
 from fastapi import APIRouter, Query
 from fastapi_cache.decorator import cache
 
+from app.hotels.schemas import SHotel, SHotelInfo
+from app.hotels.service import HotelService
+
 #from app.exceptions import CannotBookHotelForLongPeriod, DateFromCannotBeAfterDateTo
 
-from app.hotels.service import HotelService
-from app.hotels.schemas import SHotel, SHotelInfo
 
 router = APIRouter(prefix="/hotels", tags=["Отели"])
 
@@ -42,13 +43,15 @@ async def get_hotel_by_id(
     return await HotelService.find_one_or_none(id=hotel_id)
 
 
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload, joinedload
-from app.hotels.models import Hotels
-from app.hotels.rooms.models import Rooms
+from sqlalchemy.orm import joinedload, selectinload
+
 from app.bookings.models import Bookings
 from app.database import async_session_maker
-from fastapi.encoders import jsonable_encoder
+from app.hotels.models import Hotels
+from app.hotels.rooms.models import Rooms
+
 
 @router.get("/example/no_orm")
 async def get_noorm():

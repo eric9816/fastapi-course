@@ -3,8 +3,8 @@ from typing import List
 
 from fastapi import Query
 
-from app.hotels.rooms.service import RoomService
 from app.hotels.rooms.schemas import SRoomInfo
+from app.hotels.rooms.service import RoomService
 from app.hotels.router import router
 
 

@@ -1,10 +1,11 @@
 from datetime import date
 
-from sqlalchemy import select, and_, or_, insert
+from sqlalchemy import and_, insert, or_, select
 from sqlalchemy.sql.functions import count
 
 from app.bookings.models import Bookings
 from app.database import async_session_maker
+from app.hotels.models import Hotels
 from app.hotels.rooms.models import Rooms
 from app.service.base import BaseService
 
@@ -13,13 +14,7 @@ class BookingService(BaseService):
     model = Bookings
 
     @classmethod
-    async def add(
-            cls,
-            user_id: int,
-            room_id: int,
-            date_from: date,
-            date_to: date
-    ):
+    async def add(cls, user_id: int, room_id: int, date_from: date, date_to: date):
         """
         with booked_rooms as(
         select * from bookings
@@ -34,27 +29,36 @@ class BookingService(BaseService):
         group by rooms.quantity, booked_rooms.room_id
         """
         async with async_session_maker() as session:
-            booked_rooms = select(Bookings).where(
-                and_(
-                    Bookings.room_id == room_id,
-                    or_(
-                        and_(
-                            Bookings.date_from >= date_from,
-                            Bookings.date_from <= date_to
+            booked_rooms = (
+                select(Bookings)
+                .where(
+                    and_(
+                        Bookings.room_id == room_id,
+                        or_(
+                            and_(
+                                Bookings.date_from >= date_from,
+                                Bookings.date_from <= date_to,
+                            ),
+                            and_(
+                                Bookings.date_from <= date_from,
+                                Bookings.date_to >= date_from,
+                            ),
                         ),
-                        and_(
-                            Bookings.date_from <= date_from,
-                            Bookings.date_to >= date_from
-                        )
                     )
                 )
-            ).cte("booked_rooms")
+                .cte("booked_rooms")
+            )
 
-            get_rooms_left = select((Rooms.quantity - count(booked_rooms.c.room_id)).label("get_rooms_left")
-                                ).select_from(Rooms).join(
-                booked_rooms, booked_rooms.c.room_id == Rooms.id, isouter=True
-            ).where(Rooms.id == room_id).group_by(
-                Rooms.quantity, booked_rooms.c.room_id
+            get_rooms_left = (
+                select(
+                    (Rooms.quantity - count(booked_rooms.c.room_id)).label(
+                        "get_rooms_left"
+                    )
+                )
+                .select_from(Rooms)
+                .join(booked_rooms, booked_rooms.c.room_id == Rooms.id, isouter=True)
+                .where(Rooms.id == room_id)
+                .group_by(Rooms.quantity, booked_rooms.c.room_id)
             )
             rooms_left = await session.execute(get_rooms_left)
             rooms_left: int = rooms_left.scalar()
@@ -63,18 +67,24 @@ class BookingService(BaseService):
                 get_price = select(Rooms.price).filter_by(id=room_id)
                 price = await session.execute(get_price)
                 price: int = price.scalar()  # цена отеля за 1 день
-                add_booking = insert(Bookings).values(
-                    room_id=room_id,
-                    user_id=user_id,
-                    date_from=date_from,
-                    date_to=date_to,
-                    price=price
-                ).returning(Bookings)  # вернуть строку если надо (на фронте к примеру)
+                add_booking = (
+                    insert(Bookings)
+                    .values(
+                        room_id=room_id,
+                        user_id=user_id,
+                        date_from=date_from,
+                        date_to=date_to,
+                        price=price,
+                    )
+                    .returning(Bookings)
+                )  # вернуть строку если надо (на фронте к примеру)
 
                 new_booking = await session.execute(add_booking)
                 await session.commit()
 
-                return new_booking.scalar()  # scalar возвращает число, если БД вернуло число, но также scalar
-                                             # вернет строку из модели, если в returning укажем ЦЕЛИКОМ модель
+                return (
+                    new_booking.scalar()
+                )  # scalar возвращает число, если БД вернуло число, но также scalar
+                # вернет строку из модели, если в returning укажем ЦЕЛИКОМ модель
             else:
                 return None

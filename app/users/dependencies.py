@@ -1,9 +1,11 @@
-from fastapi import Request, Depends
-from jose import jwt, JWTError
-from app.config import settings
 from datetime import datetime
-from app.users.service import UserService
+
+from fastapi import Depends, Request
+from jose import JWTError, jwt
+
+from app.config import settings
 from app.exceptions import *
+from app.users.service import UserService
 
 
 def get_token(request: Request):

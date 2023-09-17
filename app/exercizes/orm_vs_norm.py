@@ -1,11 +1,13 @@
+from fastapi.encoders import jsonable_encoder
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload, joinedload
-from app.hotels.models import Hotels
-from app.hotels.rooms.models import Rooms
+from sqlalchemy.orm import joinedload, selectinload
+
 from app.bookings.models import Bookings
 from app.database import async_session_maker
-from fastapi.encoders import jsonable_encoder
+from app.hotels.models import Hotels
+from app.hotels.rooms.models import Rooms
 from app.hotels.router import router
+
 
 @router.get("/example/no_orm")
 async def get_noorm():

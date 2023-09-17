@@ -1,6 +1,6 @@
 from datetime import date
 
-from sqlalchemy import select, and_, or_
+from sqlalchemy import and_, or_, select
 from sqlalchemy.sql.functions import count, func
 
 from app.bookings.models import Bookings

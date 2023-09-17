@@ -1,11 +1,11 @@
-from fastapi import APIRouter, Response, Depends
+from fastapi import APIRouter, Depends, Response
 
-from app.users.auth import get_password_hash, authenticate_user, create_access_token
+from app.exceptions import *
+from app.users.auth import authenticate_user, create_access_token, get_password_hash
 from app.users.dependencies import get_current_user
 from app.users.models import Users
-from app.users.service import UserService
 from app.users.schemas import SUserAuth
-from app.exceptions import *
+from app.users.service import UserService
 
 router = APIRouter(
     prefix="/auth",
